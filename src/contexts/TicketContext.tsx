@@ -4,92 +4,125 @@ import { supabase } from '../lib/supabase';
 
 interface TicketContextType {
   tickets: Ticket[];
-  createTicket: (ticket: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateTicket: (id: string, updates: Partial<Ticket>) => void;
-  deleteTicket: (id: string) => void;
+  createTicket: (ticket: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateTicket: (id: string, updates: Partial<Ticket>) => Promise<void>;
+  deleteTicket: (id: string) => Promise<void>;
+  loading: boolean;
 }
 
 const TicketContext = createContext<TicketContextType | undefined>(undefined);
 
 export function TicketProvider({ children }: { children: React.ReactNode }) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load tickets from localStorage
-    const storedTickets = localStorage.getItem('helpdesk_tickets');
-    if (storedTickets) {
-      setTickets(JSON.parse(storedTickets));
-    } else {
-      // Initialize with demo tickets
-      const demoTickets: Ticket[] = [
-        {
-          id: '1',
-          title: 'Computer Won\'t Start',
-          description: 'My computer suddenly stopped working this morning. When I press the power button, nothing happens at all.',
-          category: 'Hardware Issues',
-          specificIssue: 'Computer not powering on',
-          priority: 'high',
-          status: 'open',
-          userId: '2',
-          reporterName: 'John Doe',
-          department: 'Marketing & Sales',
-          assignedAdmin: 'John Smith (IT Manager)',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: '2',
-          title: 'Blue Screen Error',
-          description: 'Getting frequent blue screen errors when trying to run multiple applications.',
-          category: 'Software Issues',
-          specificIssue: 'Blue Screen of Death (BSOD)',
-          priority: 'medium',
-          status: 'in-progress',
-          userId: '2',
-          reporterName: 'Jane Smith',
-          department: 'Finance & Accounting',
-          assignedAdmin: 'Sarah Johnson (Senior Tech)',
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          updatedAt: new Date().toISOString(),
-          adminNotes: 'Investigating memory issues. Running diagnostics.'
-        }
-      ];
-      setTickets(demoTickets);
-      localStorage.setItem('helpdesk_tickets', JSON.stringify(demoTickets));
-    }
+    loadTickets();
   }, []);
 
-  const createTicket = (ticketData: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newTicket: Ticket = {
-      ...ticketData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+  const loadTickets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('tickets')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    const updatedTickets = [...tickets, newTicket];
-    setTickets(updatedTickets);
-    localStorage.setItem('helpdesk_tickets', JSON.stringify(updatedTickets));
+      if (error) throw error;
+
+      const formattedTickets: Ticket[] = data.map(dbTicket => ({
+        id: dbTicket.id,
+        title: dbTicket.title,
+        description: dbTicket.description,
+        category: dbTicket.category,
+        specificIssue: dbTicket.specific_issue,
+        priority: dbTicket.priority as 'low' | 'medium' | 'high' | 'urgent',
+        status: dbTicket.status as 'open' | 'in-progress' | 'resolved' | 'closed',
+        userId: dbTicket.user_id,
+        reporterName: dbTicket.reporter_name,
+        department: dbTicket.department,
+        assignedAdmin: dbTicket.assigned_admin,
+        createdAt: dbTicket.created_at,
+        updatedAt: dbTicket.updated_at
+      }));
+
+      setTickets(formattedTickets);
+    } catch (error) {
+      console.error('Error loading tickets:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateTicket = (id: string, updates: Partial<Ticket>) => {
-    const updatedTickets = tickets.map(ticket =>
-      ticket.id === id
-        ? { ...ticket, ...updates, updatedAt: new Date().toISOString() }
-        : ticket
-    );
-    setTickets(updatedTickets);
-    localStorage.setItem('helpdesk_tickets', JSON.stringify(updatedTickets));
+  const createTicket = async (ticketData: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const { error } = await supabase
+        .from('tickets')
+        .insert({
+          title: ticketData.title,
+          description: ticketData.description,
+          category: ticketData.category,
+          specific_issue: ticketData.specificIssue,
+          priority: ticketData.priority,
+          status: ticketData.status,
+          reporter_name: ticketData.reporterName,
+          department: ticketData.department,
+          assigned_admin: ticketData.assignedAdmin,
+          user_id: ticketData.userId
+        });
+
+      if (error) throw error;
+
+      await loadTickets(); // Reload tickets
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      throw error;
+    }
   };
 
-  const deleteTicket = (id: string) => {
-    const updatedTickets = tickets.filter(ticket => ticket.id !== id);
-    setTickets(updatedTickets);
-    localStorage.setItem('helpdesk_tickets', JSON.stringify(updatedTickets));
+  const updateTicket = async (id: string, updates: Partial<Ticket>) => {
+    try {
+      const updateData: any = {};
+      
+      if (updates.title) updateData.title = updates.title;
+      if (updates.description) updateData.description = updates.description;
+      if (updates.status) updateData.status = updates.status;
+      if (updates.priority) updateData.priority = updates.priority;
+      if (updates.assignedAdmin) updateData.assigned_admin = updates.assignedAdmin;
+      if (updates.category) updateData.category = updates.category;
+      if (updates.specificIssue) updateData.specific_issue = updates.specificIssue;
+
+      const { error } = await supabase
+        .from('tickets')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      await loadTickets(); // Reload tickets
+    } catch (error) {
+      console.error('Error updating ticket:', error);
+      throw error;
+    }
+  };
+
+  const deleteTicket = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('tickets')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      await loadTickets(); // Reload tickets
+    } catch (error) {
+      console.error('Error deleting ticket:', error);
+      throw error;
+    }
   };
 
   return (
-    <TicketContext.Provider value={{ tickets, createTicket, updateTicket, deleteTicket }}>
+    <TicketContext.Provider value={{ tickets, createTicket, updateTicket, deleteTicket, loading }}>
       {children}
     </TicketContext.Provider>
   );
