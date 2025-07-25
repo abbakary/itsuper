@@ -132,6 +132,15 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
   const createTicket = async (ticketData: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
+      console.log('🎫 Creating new ticket...');
+
+      // Get current authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error('User must be authenticated to create tickets');
+      }
+
       const { error } = await supabase
         .from('tickets')
         .insert({
@@ -140,18 +149,22 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           category: ticketData.category,
           specific_issue: ticketData.specificIssue,
           priority: ticketData.priority,
-          status: ticketData.status,
+          status: ticketData.status || 'open',
           reporter_name: ticketData.reporterName,
           department: ticketData.department,
-          assigned_admin: ticketData.assignedAdmin,
-          user_id: ticketData.userId
+          assigned_admin: ticketData.assignedAdmin || 'Auto-assigned',
+          user_id: user.id // Use authenticated user's ID
         });
 
-      if (error) throw error;
+      if (error) {
+        logSupabaseError('Creating ticket', error);
+        throw error;
+      }
 
+      console.log('✅ Ticket created successfully');
       await loadTickets(); // Reload tickets
-    } catch (error) {
-      console.error('Error creating ticket:', error);
+    } catch (error: any) {
+      logSupabaseError('Creating ticket (catch block)', error);
       throw error;
     }
   };
