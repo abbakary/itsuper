@@ -96,6 +96,9 @@ export function LoginForm() {
 
       {/* Right Side - Login Form */}
       <div className="flex-1 bg-white flex items-center justify-center p-8">
+        {showSignUp ? (
+          <SignUpForm onBackToLogin={() => setShowSignUp(false)} />
+        ) : (
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
@@ -189,8 +192,14 @@ export function LoginForm() {
             <p className="text-xs text-gray-600 mb-2">
               Use your SuperDoll company credentials to access the IT support system.
             </p>
-            <p className="text-xs text-gray-500">
-              Don't have an account? Contact your administrator to create one for you.
+            <p className="text-xs text-gray-500 mb-2">
+              Don't have an account?
+              <button
+                onClick={() => setShowSignUp(true)}
+                className="text-blue-600 hover:text-blue-700 underline ml-1"
+              >
+                Sign up here
+              </button>
             </p>
           </div>
 
@@ -204,6 +213,7 @@ export function LoginForm() {
   </div>
 </div>
         </div>
+        )}
       </div>
     </div>
   );
