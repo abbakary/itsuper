@@ -123,35 +123,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const createUser = async (userData: Omit<User, 'id' | 'createdAt' | 'isActive'>): Promise<boolean> => {
     try {
-      const newUser: User = {
-        ...userData,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        isActive: true
-      };
-      
-      const updatedUsers = [...users, newUser];
-      setUsers(updatedUsers);
-      localStorage.setItem('helpdesk_users', JSON.stringify(updatedUsers));
-      
+      const { error } = await supabase
+        .from('users')
+        .insert({
+          email: userData.email,
+          name: userData.name,
+          role: userData.role,
+          office_name: userData.officeName || 'Default Office',
+          department: userData.department || 'General'
+        });
+
+      if (error) throw error;
+
+      await loadUsers(); // Reload users
       return true;
     } catch (error) {
+      console.error('Error creating user:', error);
       return false;
     }
   };
 
-  const updateUser = (id: string, updates: Partial<User>) => {
-    const updatedUsers = users.map(u => 
-      u.id === id ? { ...u, ...updates } : u
-    );
-    setUsers(updatedUsers);
-    localStorage.setItem('helpdesk_users', JSON.stringify(updatedUsers));
+  const updateUser = async (id: string, updates: Partial<User>) => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          name: updates.name,
+          role: updates.role,
+          office_name: updates.officeName,
+          department: updates.department
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      await loadUsers(); // Reload users
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
   };
 
-  const deleteUser = (id: string) => {
-    const updatedUsers = users.filter(u => u.id !== id);
-    setUsers(updatedUsers);
-    localStorage.setItem('helpdesk_users', JSON.stringify(updatedUsers));
+  const deleteUser = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      await loadUsers(); // Reload users
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
   };
 
   const logout = () => {
