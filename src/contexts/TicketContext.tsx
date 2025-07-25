@@ -8,6 +8,7 @@ interface TicketContextType {
   updateTicket: (id: string, updates: Partial<Ticket>) => Promise<void>;
   deleteTicket: (id: string) => Promise<void>;
   loading: boolean;
+  error?: string;
 }
 
 const TicketContext = createContext<TicketContextType | undefined>(undefined);
