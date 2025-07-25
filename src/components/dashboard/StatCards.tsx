@@ -28,14 +28,15 @@ export function StatCards({ tickets, userRole = 'user' }: StatCardsProps) {
   
   const resolutionRate = totalTickets > 0 ? Math.round(((resolvedTickets + closedTickets) / totalTickets) * 100) : 0;
 
-  const stats = [
+  const allStats = [
     {
       title: 'Open Tickets',
       value: openTickets,
       icon: AlertCircle,
       color: 'bg-blue-500',
       bgColor: 'bg-blue-50',
-      textColor: 'text-blue-600'
+      textColor: 'text-blue-600',
+      showForUser: true
     },
     {
       title: 'In Progress',
@@ -43,7 +44,8 @@ export function StatCards({ tickets, userRole = 'user' }: StatCardsProps) {
       icon: Play,
       color: 'bg-orange-500',
       bgColor: 'bg-orange-50',
-      textColor: 'text-orange-600'
+      textColor: 'text-orange-600',
+      showForUser: true
     },
     {
       title: 'Resolved',
@@ -51,7 +53,8 @@ export function StatCards({ tickets, userRole = 'user' }: StatCardsProps) {
       icon: CheckCircle,
       color: 'bg-green-500',
       bgColor: 'bg-green-50',
-      textColor: 'text-green-600'
+      textColor: 'text-green-600',
+      showForUser: true
     },
     {
       title: 'Closed',
@@ -59,7 +62,8 @@ export function StatCards({ tickets, userRole = 'user' }: StatCardsProps) {
       icon: Clock,
       color: 'bg-gray-500',
       bgColor: 'bg-gray-50',
-      textColor: 'text-gray-600'
+      textColor: 'text-gray-600',
+      showForUser: true
     },
     {
       title: 'Resolution Rate',
@@ -67,7 +71,8 @@ export function StatCards({ tickets, userRole = 'user' }: StatCardsProps) {
       icon: TrendingUp,
       color: 'bg-purple-500',
       bgColor: 'bg-purple-50',
-      textColor: 'text-purple-600'
+      textColor: 'text-purple-600',
+      showForUser: false // Admin only
     },
     {
       title: 'Active Users',
@@ -75,7 +80,8 @@ export function StatCards({ tickets, userRole = 'user' }: StatCardsProps) {
       icon: Users,
       color: 'bg-indigo-500',
       bgColor: 'bg-indigo-50',
-      textColor: 'text-indigo-600'
+      textColor: 'text-indigo-600',
+      showForUser: false // Admin only
     },
     {
       title: 'Departments',
@@ -83,7 +89,8 @@ export function StatCards({ tickets, userRole = 'user' }: StatCardsProps) {
       icon: Building2,
       color: 'bg-teal-500',
       bgColor: 'bg-teal-50',
-      textColor: 'text-teal-600'
+      textColor: 'text-teal-600',
+      showForUser: false // Admin only
     },
     {
       title: 'Total Tickets',
@@ -91,9 +98,14 @@ export function StatCards({ tickets, userRole = 'user' }: StatCardsProps) {
       icon: BarChart3,
       color: 'bg-pink-500',
       bgColor: 'bg-pink-50',
-      textColor: 'text-pink-600'
+      textColor: 'text-pink-600',
+      showForUser: true
     }
   ];
+
+  const stats = userRole === 'admin'
+    ? allStats
+    : allStats.filter(stat => stat.showForUser);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
