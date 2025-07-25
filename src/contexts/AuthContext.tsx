@@ -84,47 +84,80 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Attempting login for:', email);
 
-      // Look up user in Supabase database
-      const { data: foundUser, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .single();
-
-      if (error) {
-        console.error('User lookup error:', {
-          message: error.message,
-          code: error.code,
-          details: error.details
+      // Use the password validation function or direct query
+      const { data: validationResult, error: validationError } = await supabase
+        .rpc('validate_user_password', {
+          user_email: email,
+          user_password: password
         });
 
-        if (error.details?.includes('Results contain 0 rows')) {
-          console.log('User not found in database:', email);
+      if (validationError) {
+        console.log('Validation function not available, using direct query');
+
+        // Fallback to direct query if function doesn't exist
+        const { data: foundUser, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .eq('password_hash', password)
+          .single();
+
+        if (error) {
+          console.error('User lookup error:', {
+            message: error.message,
+            code: error.code,
+            details: error.details
+          });
+
+          if (error.details?.includes('Results contain 0 rows')) {
+            console.log('Invalid email or password');
+            return false;
+          }
+
+          throw new Error(`Database error: ${error.message}`);
+        }
+
+        if (!foundUser) {
+          console.log('Invalid email or password');
           return false;
         }
 
-        // Database connection or other errors
-        throw new Error(`Database error: ${error.message}`);
+        // Login successful with direct query
+        const userObj: User = {
+          id: foundUser.id,
+          email: foundUser.email,
+          name: foundUser.name,
+          role: foundUser.role as 'user' | 'admin',
+          createdAt: foundUser.created_at,
+          lastLogin: new Date().toISOString(),
+          isActive: true,
+          officeName: foundUser.office_name,
+          department: foundUser.department
+        };
+
+        console.log('Login successful for user:', userObj.name);
+        setUser(userObj);
+
+        // Update last login time
+        await supabase
+          .from('users')
+          .update({ updated_at: new Date().toISOString() })
+          .eq('id', foundUser.id);
+
+        return true;
       }
 
-      if (!foundUser) {
-        console.log('No user found for email:', email);
+      // Using validation function result
+      if (!validationResult || validationResult.length === 0) {
+        console.log('Invalid email or password');
         return false;
       }
 
-      // For now, we'll use a simple password validation
-      // In production, you should hash passwords and store them securely
-      // This is a basic implementation for demo purposes
-      const isValidPassword = password === '123456' || password === 'password123';
+      const foundUser = validationResult[0];
 
-      if (!isValidPassword) {
-        console.log('Invalid password for user:', email);
-        return false;
-      }
-
-      // Login successful - create user session
+      // Login successful with validation function
       const userObj: User = {
-        id: foundUser.id,
+        id: foundUser.user_id,
         email: foundUser.email,
         name: foundUser.name,
         role: foundUser.role as 'user' | 'admin',
@@ -138,11 +171,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('Login successful for user:', userObj.name);
       setUser(userObj);
 
-      // Update last login time in database
+      // Update last login time
       await supabase
         .from('users')
         .update({ updated_at: new Date().toISOString() })
-        .eq('id', foundUser.id);
+        .eq('id', foundUser.user_id);
 
       return true;
     } catch (error: any) {
