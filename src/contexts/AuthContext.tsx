@@ -24,13 +24,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Auto-login for demo purposes - replace with proper auth in production
     const autoLogin = async () => {
       try {
-        const { data: adminUser } = await supabase
+        const { data: adminUser, error } = await supabase
           .from('users')
           .select('*')
           .eq('email', 'admin@superdoll.com')
           .single();
 
-        if (adminUser) {
+        if (error) {
+          console.warn('Supabase users table not found, using demo user:', error);
+          // Use demo admin user if database is not set up
+          setUser({
+            id: 'demo-admin',
+            email: 'admin@superdoll.com',
+            name: 'SuperDoll Admin',
+            role: 'admin',
+            createdAt: new Date().toISOString(),
+            lastLogin: new Date().toISOString(),
+            isActive: true,
+            officeName: 'SuperDoll HQ',
+            department: 'Information Technology'
+          });
+        } else if (adminUser) {
           setUser({
             id: adminUser.id,
             email: adminUser.email,
@@ -45,6 +59,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error('Auto-login error:', error);
+        // Fallback to demo user
+        setUser({
+          id: 'demo-admin',
+          email: 'admin@superdoll.com',
+          name: 'SuperDoll Admin',
+          role: 'admin',
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+          isActive: true,
+          officeName: 'SuperDoll HQ',
+          department: 'Information Technology'
+        });
       } finally {
         setLoading(false);
       }
