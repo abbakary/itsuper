@@ -3,109 +3,57 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = 'https://ewckojvsymagyjwsfzwn.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3Y2tvanZzeW1hZ3lqd3NmenduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzMjcxNTYsImV4cCI6MjA2ODkwMzE1Nn0.G5uv3850aKSIX7c8a91wQBcOAkQ2K2s8qwbEy-5NN-U'
 
-// Debug logging
-console.log('Initializing Supabase client with:', {
-  url: supabaseUrl,
-  keyPrefix: supabaseKey.substring(0, 20) + '...'
-});
+console.log('🔧 Initializing Supabase client with authentication...');
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
-    persistSession: false, // Disable session persistence for now to avoid auth issues
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
   }
 });
 
-// Test connection and provide detailed diagnostics
-const testSupabaseConnection = async () => {
-  console.log('🔍 Testing Supabase connection...');
-  console.log('📍 Supabase URL:', supabaseUrl);
-
-  // First, test if the URL is reachable
-  try {
-    const response = await fetch(supabaseUrl + '/rest/v1/', {
-      method: 'GET',
-      headers: {
-        'apikey': supabaseKey,
-        'Authorization': `Bearer ${supabaseKey}`
-      }
-    });
-    console.log('🌐 Basic connectivity test:', response.status, response.statusText);
-  } catch (fetchError: any) {
-    console.error('❌ Basic connectivity failed:', fetchError.message);
-  }
-
-  try {
-    // Test Supabase client functionality
-    const { data, error } = await supabase.from('users').select('count').limit(1);
-
-    if (error) {
-      console.error('Supabase connection test failed:', {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-        status: error.status,
-        statusText: error.statusText,
-        full_error: JSON.stringify(error, null, 2)
-      });
-
-      // Provide specific guidance based on error type
-      if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
-        console.warn('🔧 SOLUTION: Tables not found. Please run the SQL schema in Supabase SQL Editor.');
-        console.log('📁 Schema location: src/database/schema.sql');
-      } else if (error.code === '401' || error.message?.includes('authorization') || error.message?.includes('JWT')) {
-        console.warn('🔑 SOLUTION: API key or authentication issue. Check your Supabase credentials.');
-      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
-        console.warn('🌐 SOLUTION: Network connectivity issue. Check your internet connection and Supabase URL.');
-      }
-
-    } else {
-      console.log('✅ Supabase connection test successful');
-    }
-  } catch (networkError: any) {
-    console.error('❌ Network error connecting to Supabase:', {
-      message: networkError?.message || 'Unknown network error',
-      name: networkError?.name,
-      stack: networkError?.stack
-    });
-    console.warn('🌐 Check your internet connection and Supabase URL');
-  }
-};
-
-// Run the test
-testSupabaseConnection();
-
+// Database type definitions
 export type Database = {
   public: {
     Tables: {
-      users: {
+      user_profiles: {
         Row: {
           id: string
           email: string
-          name: string
+          full_name: string
           role: 'user' | 'admin'
           office_name: string
           department: string
+          avatar_url: string | null
+          phone: string | null
+          is_active: boolean
           created_at: string
           updated_at: string
         }
         Insert: {
-          id?: string
+          id: string
           email: string
-          name: string
+          full_name: string
           role?: 'user' | 'admin'
-          office_name: string
-          department: string
+          office_name?: string
+          department?: string
+          avatar_url?: string | null
+          phone?: string | null
+          is_active?: boolean
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           email?: string
-          name?: string
+          full_name?: string
           role?: 'user' | 'admin'
           office_name?: string
           department?: string
+          avatar_url?: string | null
+          phone?: string | null
+          is_active?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -123,6 +71,9 @@ export type Database = {
           department: string
           assigned_admin: string
           user_id: string
+          admin_notes: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
           created_at: string
           updated_at: string
         }
@@ -136,8 +87,11 @@ export type Database = {
           specific_issue: string
           reporter_name: string
           department: string
-          assigned_admin: string
+          assigned_admin?: string
           user_id: string
+          admin_notes?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -153,6 +107,9 @@ export type Database = {
           department?: string
           assigned_admin?: string
           user_id?: string
+          admin_notes?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -161,28 +118,90 @@ export type Database = {
         Row: {
           id: string
           ticket_id: string
+          sender_id: string
           sender_name: string
           sender_role: 'user' | 'admin'
           message: string
+          is_internal: boolean
           created_at: string
         }
         Insert: {
           id?: string
           ticket_id: string
+          sender_id: string
           sender_name: string
           sender_role: 'user' | 'admin'
           message: string
+          is_internal?: boolean
           created_at?: string
         }
         Update: {
           id?: string
           ticket_id?: string
+          sender_id?: string
           sender_name?: string
           sender_role?: 'user' | 'admin'
           message?: string
+          is_internal?: boolean
           created_at?: string
         }
       }
     }
+    Functions: {
+      get_user_profile: {
+        Args: { user_id?: string }
+        Returns: {
+          id: string
+          email: string
+          full_name: string
+          role: string
+          office_name: string
+          department: string
+          avatar_url: string | null
+          phone: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      is_admin: {
+        Args: { user_id?: string }
+        Returns: boolean
+      }
+    }
   }
 }
+
+// Test authentication and database connection
+const testConnection = async () => {
+  console.log('🔍 Testing Supabase connection and authentication...');
+  
+  try {
+    // Test basic connectivity
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    console.log('📱 Current session:', session ? 'Active' : 'None', sessionError ? `Error: ${sessionError.message}` : '');
+    
+    // Test database access
+    const { data, error } = await supabase.from('user_profiles').select('count').limit(1);
+    
+    if (error) {
+      console.error('❌ Database connection failed:', {
+        message: error.message,
+        code: error.code,
+        details: error.details
+      });
+      
+      if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+        console.warn('🔧 Tables not found. Please run the complete_schema.sql in Supabase SQL Editor.');
+      }
+    } else {
+      console.log('✅ Database connection successful');
+    }
+    
+  } catch (error: any) {
+    console.error('❌ Connection test failed:', error.message);
+  }
+};
+
+// Run connection test
+testConnection();
