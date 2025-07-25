@@ -31,7 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single();
 
         if (error) {
-          console.warn('Supabase users table not found, using demo user:', error);
+          console.warn('Supabase users table not found, using demo user:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code,
+            full_error: JSON.stringify(error, null, 2)
+          });
           // Use demo admin user if database is not set up
           setUser({
             id: 'demo-admin',
