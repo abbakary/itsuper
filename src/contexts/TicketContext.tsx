@@ -72,9 +72,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
         // Check if it's a table not found error
         if (isMissingTableError(error)) {
-          console.warn('🔧 Tables not found in Supabase. Using demo data. Please run the SQL schema first.');
-          setError('Database tables not found. Using demo data. Please run the SQL schema in Supabase.');
-          setTickets(DEMO_TICKETS);
+          console.error('🔧 Database tables not found. Please run the SQL schema in Supabase.');
+          setError('Database tables not found. Please run the SQL schema in Supabase SQL Editor.');
+          setTickets([]);
           return;
         }
 
