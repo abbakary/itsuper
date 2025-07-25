@@ -29,12 +29,12 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
           <div className="flex justify-between items-center h-16">
             {/* Logo and Title */}
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-2 rounded-lg">
-                <Computer className="w-6 h-6 text-white" />
+              <div className="bg-gradient-to-r from-yellow-400 to-blue-500 p-2 rounded-lg">
+                <Star className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">IT Help Desk</h1>
-                <p className="text-xs text-gray-500">Technical Support System</p>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-yellow-500 to-blue-600 bg-clip-text text-transparent">SuperDoll</h1>
+                <p className="text-xs text-gray-500">IT Support & Excellence</p>
               </div>
             </div>
 
