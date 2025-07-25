@@ -37,17 +37,17 @@ export function LoginForm() {
       localStorage.removeItem('helpdesk_remembered_credentials');
     }
 
-    // Use the login function from AuthContext
-    login(email, password).then(success => {
+    // Use the signIn function from AuthContext
+    signIn(email, password).then(({ success, error: authError }) => {
       if (!success) {
-        setError('Invalid email or password. Please check your credentials and try again.');
+        setError(authError || 'Invalid email or password. Please check your credentials and try again.');
         // Clear remembered credentials if login fails
         if (rememberMe) {
           localStorage.removeItem('helpdesk_remembered_credentials');
           setRememberMe(false);
         }
       }
-      // Login success is handled by App.tsx routing
+      // Login success is handled by App.tsx routing via auth state change
     }).catch((error) => {
       console.error('Login error:', error);
       setError(`Login failed: ${error.message || 'Please contact your administrator.'}`);
