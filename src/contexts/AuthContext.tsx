@@ -87,7 +87,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error loading users:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          full_error: JSON.stringify(error, null, 2)
+        });
+        throw error;
+      }
 
       const formattedUsers: User[] = data.map(dbUser => ({
         id: dbUser.id,
@@ -102,8 +111,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }));
 
       setUsers(formattedUsers);
-    } catch (error) {
-      console.error('Error loading users:', error);
+    } catch (error: any) {
+      console.error('Error loading users:', {
+        message: error?.message || 'Unknown error',
+        name: error?.name,
+        stack: error?.stack,
+        full_error: JSON.stringify(error, null, 2)
+      });
     }
   };
 
