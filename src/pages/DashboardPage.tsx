@@ -15,7 +15,7 @@ interface DashboardPageProps {
 
 export function DashboardPage({ onNavigate, onTicketSelect }: DashboardPageProps) {
   const { tickets, error } = useTickets();
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [filter, setFilter] = useState<'all' | 'open' | 'in-progress' | 'resolved' | 'closed'>('all');
   const [showError, setShowError] = useState(true);
 
