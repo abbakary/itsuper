@@ -184,8 +184,11 @@ export function LoginForm() {
           {/* Company Info */}
           <div className="mt-8 p-4 bg-gradient-to-r from-yellow-50 to-blue-50 rounded-lg border border-yellow-200">
             <h3 className="text-sm font-medium text-gray-700 mb-2">SuperDoll IT Support</h3>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-gray-600 mb-2">
               Use your SuperDoll company credentials to access the IT support system.
+            </p>
+            <p className="text-xs text-gray-500">
+              Don't have an account? Contact your administrator to create one for you.
             </p>
           </div>
 
