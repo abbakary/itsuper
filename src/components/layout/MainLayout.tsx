@@ -114,10 +114,10 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-500">
-              © 2025 IT Help Desk System. All rights reserved.
+              © 2025 SuperDoll IT Support System. All rights reserved.
             </p>
             <p className="text-sm text-gray-500">
-              Need help? Contact IT Support
+              Trust - Excellence in Service
             </p>
           </div>
         </div>
