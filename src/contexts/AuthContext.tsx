@@ -21,74 +21,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Auto-login for demo purposes - replace with proper auth in production
-    const autoLogin = async () => {
+    // Initialize but don't auto-login - let users login manually
+    const initialize = async () => {
       try {
-        const { data: adminUser, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('email', 'admin@superdoll.com')
-          .single();
-
-        if (error) {
-          console.warn('Supabase users table not found, using demo user:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code,
-            full_error: JSON.stringify(error, null, 2)
-          });
-          // Use demo admin user if database is not set up
-          setUser({
-            id: 'demo-admin',
-            email: 'admin@superdoll.com',
-            name: 'SuperDoll Admin',
-            role: 'admin',
-            createdAt: new Date().toISOString(),
-            lastLogin: new Date().toISOString(),
-            isActive: true,
-            officeName: 'SuperDoll HQ',
-            department: 'Information Technology'
-          });
-        } else if (adminUser) {
-          setUser({
-            id: adminUser.id,
-            email: adminUser.email,
-            name: adminUser.name,
-            role: adminUser.role as 'user' | 'admin',
-            createdAt: adminUser.created_at,
-            lastLogin: new Date().toISOString(),
-            isActive: true,
-            officeName: adminUser.office_name,
-            department: adminUser.department
-          });
-        }
+        // Just load users list, don't auto-login
+        await loadUsers();
+        console.log('🚀 SuperDoll IT Support System initialized');
+        console.log('👋 Please login with your credentials');
       } catch (error: any) {
-        console.error('Auto-login error:', {
+        console.error('Initialization error:', {
           message: error?.message || 'Unknown error',
-          name: error?.name,
-          stack: error?.stack,
           full_error: JSON.stringify(error, null, 2)
-        });
-        // Fallback to demo user
-        setUser({
-          id: 'demo-admin',
-          email: 'admin@superdoll.com',
-          name: 'SuperDoll Admin',
-          role: 'admin',
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
-          isActive: true,
-          officeName: 'SuperDoll HQ',
-          department: 'Information Technology'
         });
       } finally {
         setLoading(false);
       }
     };
 
-    loadUsers();
-    autoLogin();
+    initialize();
   }, []);
 
   const loadUsers = async () => {
