@@ -13,9 +13,44 @@ interface TicketContextType {
 
 const TicketContext = createContext<TicketContextType | undefined>(undefined);
 
+// Demo tickets for fallback
+const DEMO_TICKETS: Ticket[] = [
+  {
+    id: '1',
+    title: 'Computer Won\'t Start',
+    description: 'My computer suddenly stopped working this morning. When I press the power button, nothing happens at all.',
+    category: 'Hardware Issues',
+    specificIssue: 'Computer not powering on',
+    priority: 'high',
+    status: 'open',
+    userId: 'demo-user',
+    reporterName: 'John Doe',
+    department: 'Marketing & Sales',
+    assignedAdmin: 'Kido Muhammed - Senior IT Tech',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '2',
+    title: 'Blue Screen Error',
+    description: 'Getting frequent blue screen errors when trying to run multiple applications.',
+    category: 'Software Issues',
+    specificIssue: 'Blue Screen of Death (BSOD)',
+    priority: 'medium',
+    status: 'in-progress',
+    userId: 'demo-user',
+    reporterName: 'Jane Smith',
+    department: 'Finance & Accounting',
+    assignedAdmin: 'Billy M - Network Admin',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
+
 export function TicketProvider({ children }: { children: React.ReactNode }) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     loadTickets();
