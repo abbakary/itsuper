@@ -21,20 +21,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Initialize but don't auto-login - let users login manually
+    // Initialize the app - load users list and set ready state
     const initialize = async () => {
+      console.log('🚀 Initializing SuperDoll IT Support System...');
       try {
-        // Just load users list, don't auto-login
         await loadUsers();
-        console.log('🚀 SuperDoll IT Support System initialized');
-        console.log('👋 Please login with your credentials');
+        console.log('✅ Connected to Supabase database');
       } catch (error: any) {
-        console.error('Initialization error:', {
-          message: error?.message || 'Unknown error',
-          full_error: JSON.stringify(error, null, 2)
-        });
+        console.error('❌ Database connection failed:', error?.message || 'Unknown error');
       } finally {
         setLoading(false);
+        console.log('👋 Ready for login');
       }
     };
 
