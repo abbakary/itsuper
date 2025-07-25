@@ -73,12 +73,22 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           hint: error.hint,
           code: error.code
         });
+
+        // Check if it's a table not found error
+        if (error.code === 'PGRST116' || error.message?.includes('relation "public.tickets" does not exist')) {
+          console.warn('Tables not found in Supabase. Using demo data. Please run the SQL schema first.');
+          setError('Database tables not found. Using demo data. Please run the SQL schema in Supabase.');
+          setTickets(DEMO_TICKETS);
+          return;
+        }
+
         throw error;
       }
 
       if (!data) {
-        console.log('No data returned from Supabase');
+        console.log('No data returned from Supabase, using empty array');
         setTickets([]);
+        setError(undefined);
         return;
       }
 
@@ -102,14 +112,18 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
       console.log('Formatted tickets:', formattedTickets);
       setTickets(formattedTickets);
+      setError(undefined);
     } catch (error: any) {
       console.error('Error loading tickets:', {
         message: error?.message || 'Unknown error',
         error: error,
         stack: error?.stack
       });
-      // For now, set empty array and continue
-      setTickets([]);
+
+      // Set error message for display
+      setError(`Database connection failed: ${error?.message || 'Unknown error'}. Using demo data.`);
+      // Use demo data as fallback
+      setTickets(DEMO_TICKETS);
     } finally {
       setLoading(false);
     }
