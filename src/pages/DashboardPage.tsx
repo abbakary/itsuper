@@ -3,6 +3,7 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { TicketList } from '../components/tickets/TicketList';
 import { StatCards } from '../components/dashboard/StatCards';
 import { DashboardHeader } from '../components/dashboard/DashboardHeader';
+import { ErrorNotification } from '../components/ui/ErrorNotification';
 import { useTickets } from '../contexts/TicketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Ticket } from '../types';
