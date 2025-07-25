@@ -181,14 +181,15 @@ export function LoginForm() {
             </button>
           </form>
 
-          {/* Demo Credentials */}
-          {/* <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
-            <div className="text-xs text-gray-600 space-y-1">
-              <p><strong>Admin:</strong> admin@example.com / admin123</p>
-              <p><strong>User:</strong> user@example.com / user123</p>
+          {/* Login Info */}
+          <div className="mt-8 p-4 bg-gradient-to-r from-yellow-50 to-blue-50 rounded-lg border border-yellow-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">SuperDoll IT Support Login</h3>
+            <div className="text-xs text-gray-600 space-y-2">
+              <p><strong>🔑 Admin Access:</strong> admin@superdoll.com / admin123</p>
+              <p><strong>👤 New User:</strong> Use any email + password "123456" to auto-register</p>
+              <p><strong>💡 Your Account:</strong> abbakaryamary@gmail.com / 123456</p>
             </div>
-          </div> */}
+          </div>
 
           {/* Footer Logo */}
           <div className="mt-8 flex justify-center items-center">
