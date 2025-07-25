@@ -45,7 +45,7 @@ export function DashboardPage({ onNavigate, onTicketSelect }: DashboardPageProps
           />
         )}
 
-        <StatCards tickets={tickets} userRole={user?.role} />
+        <StatCards tickets={tickets} userRole={userProfile?.role} />
         
         {/* Filter Buttons */}
         <div className="flex gap-2 mb-6">
