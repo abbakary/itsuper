@@ -5,7 +5,7 @@ import logo from '../../assets/images/wecare.png';
 import superdollLogo from '../../assets/images/stm_logo.png';
 
 export function LoginForm() {
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
