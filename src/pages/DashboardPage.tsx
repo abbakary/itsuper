@@ -14,9 +14,10 @@ interface DashboardPageProps {
 }
 
 export function DashboardPage({ onNavigate, onTicketSelect }: DashboardPageProps) {
-  const { tickets } = useTickets();
+  const { tickets, error } = useTickets();
   const { user } = useAuth();
   const [filter, setFilter] = useState<'all' | 'open' | 'in-progress' | 'resolved' | 'closed'>('all');
+  const [showError, setShowError] = useState(true);
 
   const filteredTickets = tickets.filter((ticket: Ticket) => {
     if (user?.role === 'user' && ticket.userId !== user.id) {
