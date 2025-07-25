@@ -59,21 +59,30 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
   const loadTickets = async () => {
     try {
-      console.log('Loading tickets from Supabase...');
+      console.log('🎫 Loading tickets from Supabase...');
+
+      // Try to load tickets with user profile information
       const { data, error } = await supabase
         .from('tickets')
-        .select('*')
+        .select(`
+          *,
+          user_profiles (
+            full_name,
+            email,
+            role,
+            office_name,
+            department
+          )
+        `)
         .order('created_at', { ascending: false });
-
-      console.log('Supabase response:', { data, error });
 
       if (error) {
         logSupabaseError('Loading tickets', error);
 
         // Check if it's a table not found error
         if (isMissingTableError(error)) {
-          console.error('🔧 Database tables not found. Please run the SQL schema in Supabase.');
-          setError('Database tables not found. Please run the SQL schema in Supabase SQL Editor.');
+          console.warn('🔧 Database tables not found. Please run the complete_schema.sql in Supabase SQL Editor.');
+          setError('Database tables not found. Please run the complete_schema.sql in Supabase SQL Editor.');
           setTickets([]);
           return;
         }
@@ -81,14 +90,14 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         throw error;
       }
 
-      if (!data) {
-        console.log('No data returned from Supabase, using empty array');
+      if (!data || data.length === 0) {
+        console.log('📭 No tickets found in database');
         setTickets([]);
         setError(undefined);
         return;
       }
 
-      console.log('Raw tickets data:', data);
+      console.log(`📊 Found ${data.length} tickets in database`);
 
       const formattedTickets: Ticket[] = data.map(dbTicket => ({
         id: dbTicket.id,
@@ -106,19 +115,15 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         updatedAt: dbTicket.updated_at
       }));
 
-      console.log('Formatted tickets:', formattedTickets);
+      console.log('✅ Tickets loaded successfully');
       setTickets(formattedTickets);
       setError(undefined);
     } catch (error: any) {
-      console.error('Error loading tickets:', {
-        message: error?.message || 'Unknown error',
-        error: error,
-        stack: error?.stack
-      });
+      logSupabaseError('Loading tickets (catch block)', error);
 
       // Set error message for display
-      setError(`Database connection failed: ${error?.message || 'Unknown error'}. Please check your database connection.`);
-      // Set empty tickets on error
+      const errorMessage = error?.message || 'Unknown database error';
+      setError(`Database connection failed: ${errorMessage}. Please check your database connection.`);
       setTickets([]);
     } finally {
       setLoading(false);
