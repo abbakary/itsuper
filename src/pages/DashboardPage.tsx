@@ -20,7 +20,8 @@ export function DashboardPage({ onNavigate, onTicketSelect }: DashboardPageProps
   const [showError, setShowError] = useState(true);
 
   const filteredTickets = tickets.filter((ticket: Ticket) => {
-    if (user?.role === 'user' && ticket.userId !== user.id) {
+    // If user is not admin, only show their own tickets
+    if (userProfile?.role !== 'admin' && ticket.userId !== user?.id) {
       return false;
     }
     if (filter === 'all') return true;
