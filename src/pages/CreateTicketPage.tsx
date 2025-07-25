@@ -9,7 +9,7 @@ interface CreateTicketPageProps {
 }
 
 export function CreateTicketPage({ onNavigate }: CreateTicketPageProps) {
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
 
   const handleSubmit = () => {
     onNavigate('dashboard');
@@ -17,7 +17,7 @@ export function CreateTicketPage({ onNavigate }: CreateTicketPageProps) {
 
   return (
     <MainLayout onNavigate={onNavigate}>
-      {user?.role === 'admin' ? (
+      {userProfile?.role === 'admin' ? (
         <TicketForm onSubmit={handleSubmit} />
       ) : (
         <SimpleTicketForm onSubmit={handleSubmit} />
