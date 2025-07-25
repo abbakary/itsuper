@@ -17,10 +17,25 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 
 // Test connection and provide detailed diagnostics
 const testSupabaseConnection = async () => {
-  console.log('Testing Supabase connection...');
+  console.log('🔍 Testing Supabase connection...');
+  console.log('📍 Supabase URL:', supabaseUrl);
+
+  // First, test if the URL is reachable
+  try {
+    const response = await fetch(supabaseUrl + '/rest/v1/', {
+      method: 'GET',
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`
+      }
+    });
+    console.log('🌐 Basic connectivity test:', response.status, response.statusText);
+  } catch (fetchError: any) {
+    console.error('❌ Basic connectivity failed:', fetchError.message);
+  }
 
   try {
-    // First test basic connectivity
+    // Test Supabase client functionality
     const { data, error } = await supabase.from('users').select('count').limit(1);
 
     if (error) {
