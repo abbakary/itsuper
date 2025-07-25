@@ -175,31 +175,55 @@ export type Database = {
 // Test authentication and database connection
 const testConnection = async () => {
   console.log('🔍 Testing Supabase connection and authentication...');
-  
+
   try {
     // Test basic connectivity
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    console.log('📱 Current session:', session ? 'Active' : 'None', sessionError ? `Error: ${sessionError.message}` : '');
-    
+    console.log('📱 Current session:', session ? 'Active' : 'None');
+
+    if (sessionError) {
+      console.group('⚠️ Session Error:');
+      console.error('Message:', sessionError.message);
+      console.error('Details:', sessionError);
+      console.groupEnd();
+    }
+
     // Test database access
     const { data, error } = await supabase.from('user_profiles').select('count').limit(1);
-    
+
     if (error) {
-      console.error('❌ Database connection failed:', {
-        message: error.message,
-        code: error.code,
-        details: error.details
-      });
-      
-      if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
-        console.warn('🔧 Tables not found. Please run the complete_schema.sql in Supabase SQL Editor.');
+      console.group('❌ Database Connection Failed:');
+      console.error('Message:', error.message || 'Unknown error');
+      console.error('Code:', error.code || 'No code');
+      console.error('Details:', error.details || 'No details');
+      console.error('Hint:', error.hint || 'No hint');
+
+      // Try to stringify the full error
+      try {
+        console.error('Full Error:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      } catch {
+        console.error('Raw Error Object:', error);
       }
+
+      if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+        console.warn('🔧 SOLUTION: Tables not found. Run complete_schema.sql in Supabase SQL Editor.');
+      } else if (error.message?.includes('JWT') || error.message?.includes('authorization')) {
+        console.warn('🔑 SOLUTION: Authentication issue. Check your Supabase API key.');
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        console.warn('🌐 SOLUTION: Network issue. Check internet connection and Supabase URL.');
+      }
+
+      console.groupEnd();
     } else {
       console.log('✅ Database connection successful');
     }
-    
+
   } catch (error: any) {
-    console.error('❌ Connection test failed:', error.message);
+    console.group('❌ Connection Test Failed:');
+    console.error('Message:', error?.message || 'Unknown error');
+    console.error('Name:', error?.name || 'Unknown');
+    console.error('Stack:', error?.stack || 'No stack trace');
+    console.groupEnd();
   }
 };
 
