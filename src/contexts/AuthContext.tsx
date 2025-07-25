@@ -49,14 +49,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Supabase error loading users:', {
+        console.error('Error loading users from Supabase:', {
           message: error.message,
-          details: error.details,
-          hint: error.hint,
           code: error.code,
-          full_error: JSON.stringify(error, null, 2)
+          details: error.details
         });
         throw error;
+      }
+
+      if (!data) {
+        console.log('No users found in database');
+        setUsers([]);
+        return;
       }
 
       const formattedUsers: User[] = data.map(dbUser => ({
@@ -71,14 +75,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         department: dbUser.department
       }));
 
+      console.log(`Loaded ${formattedUsers.length} users from database`);
       setUsers(formattedUsers);
     } catch (error: any) {
-      console.error('Error loading users:', {
-        message: error?.message || 'Unknown error',
-        name: error?.name,
-        stack: error?.stack,
-        full_error: JSON.stringify(error, null, 2)
-      });
+      console.error('Failed to load users:', error?.message || 'Unknown error');
+      setUsers([]); // Set empty array on error
     }
   };
 
