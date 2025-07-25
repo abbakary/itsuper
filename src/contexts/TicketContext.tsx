@@ -68,17 +68,11 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       console.log('Supabase response:', { data, error });
 
       if (error) {
-        console.error('Supabase error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-          full_error: JSON.stringify(error, null, 2)
-        });
+        logSupabaseError('Loading tickets', error);
 
         // Check if it's a table not found error
-        if (error.code === 'PGRST116' || error.message?.includes('relation "public.tickets" does not exist')) {
-          console.warn('Tables not found in Supabase. Using demo data. Please run the SQL schema first.');
+        if (isMissingTableError(error)) {
+          console.warn('🔧 Tables not found in Supabase. Using demo data. Please run the SQL schema first.');
           setError('Database tables not found. Using demo data. Please run the SQL schema in Supabase.');
           setTickets(DEMO_TICKETS);
           return;
