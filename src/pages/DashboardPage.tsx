@@ -35,6 +35,15 @@ export function DashboardPage({ onNavigate, onTicketSelect }: DashboardPageProps
     <MainLayout onNavigate={onNavigate}>
       <div className="space-y-6">
         <DashboardHeader onNavigate={onNavigate} />
+
+        {/* Error Notification */}
+        {error && showError && (
+          <ErrorNotification
+            message={error}
+            onDismiss={() => setShowError(false)}
+          />
+        )}
+
         <StatCards tickets={tickets} userRole={user?.role} />
         
         {/* Filter Buttons */}
