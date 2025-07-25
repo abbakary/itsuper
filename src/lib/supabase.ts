@@ -18,7 +18,13 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 // Test connection
 supabase.from('users').select('count').limit(1).then(({ data, error }) => {
   if (error) {
-    console.error('Supabase connection test failed:', error);
+    console.error('Supabase connection test failed:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+      full_error: JSON.stringify(error, null, 2)
+    });
   } else {
     console.log('Supabase connection test successful');
   }
