@@ -3,7 +3,26 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = 'https://ewckojvsymagyjwsfzwn.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3Y2tvanZzeW1hZ3lqd3NmenduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzMjcxNTYsImV4cCI6MjA2ODkwMzE1Nn0.G5uv3850aKSIX7c8a91wQBcOAkQ2K2s8qwbEy-5NN-U'
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Debug logging
+console.log('Initializing Supabase client with:', {
+  url: supabaseUrl,
+  keyPrefix: supabaseKey.substring(0, 20) + '...'
+});
+
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: false, // Disable session persistence for now to avoid auth issues
+  }
+});
+
+// Test connection
+supabase.from('users').select('count').limit(1).then(({ data, error }) => {
+  if (error) {
+    console.error('Supabase connection test failed:', error);
+  } else {
+    console.log('Supabase connection test successful');
+  }
+});
 
 export type Database = {
   public: {
