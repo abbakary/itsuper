@@ -86,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Attempting login for:', email);
 
+      // Look up user in Supabase database
       const { data: foundUser, error } = await supabase
         .from('users')
         .select('*')
@@ -93,124 +94,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) {
-        console.log('User lookup error:', error);
+        console.error('User lookup error:', {
+          message: error.message,
+          code: error.code,
+          details: error.details
+        });
 
-        // If user doesn't exist, create them automatically for demo purposes
-        if (error.code === 'PGRST116' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
-          console.log('Database tables not found, using demo mode');
-          // Use demo user for missing database
-          if (email === 'admin@superdoll.com' && password === 'admin123') {
-            setUser({
-              id: 'demo-admin',
-              email: 'admin@superdoll.com',
-              name: 'SuperDoll Admin',
-              role: 'admin',
-              createdAt: new Date().toISOString(),
-              lastLogin: new Date().toISOString(),
-              isActive: true,
-              officeName: 'SuperDoll HQ',
-              department: 'Information Technology'
-            });
-            return true;
-          }
+        if (error.details?.includes('Results contain 0 rows')) {
+          console.log('User not found in database:', email);
           return false;
         }
 
-        // User not found, create new user
-        if (error.details?.includes('Results contain 0 rows') || error.code === 'PGRST116') {
-          console.log('User not found, creating new user:', email);
-          return await createAndLoginUser(email, password);
-        }
+        // Database connection or other errors
+        throw new Error(`Database error: ${error.message}`);
+      }
 
+      if (!foundUser) {
+        console.log('No user found for email:', email);
         return false;
       }
 
-      // User found, validate password
-      const isValidPassword =
-        (email === 'admin@superdoll.com' && password === 'admin123') ||
-        (email === 'user@superdoll.com' && password === 'user123') ||
-        (password === 'password123') || // Default password for other users
-        (password === '123456'); // Common test password
+      // For now, we'll use a simple password validation
+      // In production, you should hash passwords and store them securely
+      // This is a basic implementation for demo purposes
+      const isValidPassword = password === '123456' || password === 'password123';
 
-      if (isValidPassword) {
-        const userObj: User = {
-          id: foundUser.id,
-          email: foundUser.email,
-          name: foundUser.name,
-          role: foundUser.role as 'user' | 'admin',
-          createdAt: foundUser.created_at,
-          lastLogin: new Date().toISOString(),
-          isActive: true,
-          officeName: foundUser.office_name,
-          department: foundUser.department
-        };
-
-        setUser(userObj);
-        return true;
+      if (!isValidPassword) {
+        console.log('Invalid password for user:', email);
+        return false;
       }
 
-      console.log('Invalid password for user:', email);
-      return false;
+      // Login successful - create user session
+      const userObj: User = {
+        id: foundUser.id,
+        email: foundUser.email,
+        name: foundUser.name,
+        role: foundUser.role as 'user' | 'admin',
+        createdAt: foundUser.created_at,
+        lastLogin: new Date().toISOString(),
+        isActive: true,
+        officeName: foundUser.office_name,
+        department: foundUser.department
+      };
+
+      console.log('Login successful for user:', userObj.name);
+      setUser(userObj);
+
+      // Update last login time in database
+      await supabase
+        .from('users')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', foundUser.id);
+
+      return true;
     } catch (error: any) {
       console.error('Login error:', {
         message: error?.message || 'Unknown error',
-        code: error?.code,
-        full_error: JSON.stringify(error, null, 2)
+        code: error?.code
       });
       return false;
-    }
-  };
-
-  // Helper function to create and login new user
-  const createAndLoginUser = async (email: string, password: string): Promise<boolean> => {
-    try {
-      // Extract name from email
-      const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-
-      const newUserData = {
-        email: email,
-        name: name,
-        role: 'user' as const,
-        office_name: 'SuperDoll Branch Office',
-        department: 'General'
-      };
-
-      const { data: createdUser, error: createError } = await supabase
-        .from('users')
-        .insert(newUserData)
-        .select()
-        .single();
-
-      if (createError) {
-        console.error('Error creating user:', createError);
-        throw new Error(`Database error creating new user: ${createError.message}`);
-      }
-
-      if (createdUser) {
-        console.log('User created successfully:', createdUser);
-
-        // Log in the newly created user
-        const userObj: User = {
-          id: createdUser.id,
-          email: createdUser.email,
-          name: createdUser.name,
-          role: createdUser.role as 'user' | 'admin',
-          createdAt: createdUser.created_at,
-          lastLogin: new Date().toISOString(),
-          isActive: true,
-          officeName: createdUser.office_name,
-          department: createdUser.department
-        };
-
-        setUser(userObj);
-        await loadUsers(); // Refresh users list
-        return true;
-      }
-
-      return false;
-    } catch (error: any) {
-      console.error('Error in createAndLoginUser:', error);
-      throw error;
     }
   };
 
