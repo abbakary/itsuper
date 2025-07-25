@@ -40,26 +40,17 @@ export function LoginForm() {
     // Use the login function from AuthContext
     login(email, password).then(success => {
       if (!success) {
-        setError('Invalid credentials. Use demo accounts: admin@example.com/admin123 or user@example.com/user123');
+        setError('Invalid credentials. Use demo account: admin@superdoll.com/admin123 or create a new account with any email and password "123456"');
         // Clear remembered credentials if login fails
         if (rememberMe) {
           localStorage.removeItem('helpdesk_remembered_credentials');
           setRememberMe(false);
         }
-      } else {
-        // Redirect to appropriate page based on user role
-        const storedUser = localStorage.getItem('helpdesk_user');
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-          if (user.role === 'user') {
-            window.location.href = '/dashboard';
-          } else {
-            window.location.href = '/';
-          }
-        }
       }
-    }).catch(() => {
-      setError('Login failed. Please try again.');
+      // Note: Removing redirect logic as it's handled by App.tsx routing
+    }).catch((error) => {
+      console.error('Login error:', error);
+      setError(`Login failed: ${error.message || 'Please try again.'}`);
     });
   };
 
