@@ -187,7 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const createUser = async (userData: Omit<User, 'id' | 'createdAt' | 'isActive'>): Promise<boolean> => {
+  const createUser = async (userData: Omit<User, 'id' | 'createdAt' | 'isActive'> & { password?: string }): Promise<boolean> => {
     try {
       const { error } = await supabase
         .from('users')
@@ -196,15 +196,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           name: userData.name,
           role: userData.role,
           office_name: userData.officeName || 'Default Office',
-          department: userData.department || 'General'
+          department: userData.department || 'General',
+          password_hash: userData.password || '123456' // Default password
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating user in database:', error);
+        throw error;
+      }
 
+      console.log('User created successfully');
       await loadUsers(); // Reload users
       return true;
-    } catch (error) {
-      console.error('Error creating user:', error);
+    } catch (error: any) {
+      console.error('Error creating user:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details
+      });
       return false;
     }
   };
