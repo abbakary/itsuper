@@ -22,12 +22,31 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
 
   const loadTickets = async () => {
     try {
+      console.log('Loading tickets from Supabase...');
       const { data, error } = await supabase
         .from('tickets')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('Supabase response:', { data, error });
+
+      if (error) {
+        console.error('Supabase error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        throw error;
+      }
+
+      if (!data) {
+        console.log('No data returned from Supabase');
+        setTickets([]);
+        return;
+      }
+
+      console.log('Raw tickets data:', data);
 
       const formattedTickets: Ticket[] = data.map(dbTicket => ({
         id: dbTicket.id,
@@ -45,9 +64,16 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         updatedAt: dbTicket.updated_at
       }));
 
+      console.log('Formatted tickets:', formattedTickets);
       setTickets(formattedTickets);
-    } catch (error) {
-      console.error('Error loading tickets:', error);
+    } catch (error: any) {
+      console.error('Error loading tickets:', {
+        message: error?.message || 'Unknown error',
+        error: error,
+        stack: error?.stack
+      });
+      // For now, set empty array and continue
+      setTickets([]);
     } finally {
       setLoading(false);
     }
