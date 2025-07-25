@@ -1,14 +1,16 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { 
-  LogOut, 
-  Settings, 
-  Bell, 
+import { MovingText } from '../ui/MovingText';
+import {
+  LogOut,
+  Settings,
+  Bell,
   User,
   Shield,
   Computer,
   BarChart3,
-  Users
+  Users,
+  Star
 } from 'lucide-react';
 
 interface MainLayoutProps {
