@@ -117,9 +117,9 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       });
 
       // Set error message for display
-      setError(`Database connection failed: ${error?.message || 'Unknown error'}. Using demo data.`);
-      // Use demo data as fallback
-      setTickets(DEMO_TICKETS);
+      setError(`Database connection failed: ${error?.message || 'Unknown error'}. Please check your database connection.`);
+      // Set empty tickets on error
+      setTickets([]);
     } finally {
       setLoading(false);
     }
