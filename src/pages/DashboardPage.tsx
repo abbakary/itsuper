@@ -33,7 +33,7 @@ export function DashboardPage({ onNavigate, onTicketSelect }: DashboardPageProps
     <MainLayout onNavigate={onNavigate}>
       <div className="space-y-6">
         <DashboardHeader onNavigate={onNavigate} />
-        <StatCards tickets={tickets} />
+        <StatCards tickets={tickets} userRole={user?.role} />
         
         {/* Filter Buttons */}
         <div className="flex gap-2 mb-6">
