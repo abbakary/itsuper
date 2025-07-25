@@ -48,19 +48,19 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
               {/* User Profile */}
               <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
                 <div className={`p-2 rounded-lg ${
-                  user?.role === 'admin' 
-                    ? 'bg-purple-100 text-purple-600' 
+                  userProfile?.role === 'admin'
+                    ? 'bg-purple-100 text-purple-600'
                     : 'bg-blue-100 text-blue-600'
                 }`}>
-                  {user?.role === 'admin' ? (
+                  {userProfile?.role === 'admin' ? (
                     <Shield className="w-4 h-4" />
                   ) : (
                     <User className="w-4 h-4" />
                   )}
                 </div>
                 <div className="text-sm">
-                  <p className="font-medium text-gray-900">{user?.name || 'User'}</p>
-                  <p className="text-gray-500 capitalize">{user?.role} Account</p>
+                  <p className="font-medium text-gray-900">{userProfile?.full_name || user?.email || 'User'}</p>
+                  <p className="text-gray-500 capitalize">{userProfile?.role || 'user'} Account</p>
                 </div>
               </div>
 
