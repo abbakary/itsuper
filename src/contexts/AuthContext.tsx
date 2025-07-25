@@ -63,8 +63,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             department: adminUser.department
           });
         }
-      } catch (error) {
-        console.error('Auto-login error:', error);
+      } catch (error: any) {
+        console.error('Auto-login error:', {
+          message: error?.message || 'Unknown error',
+          name: error?.name,
+          stack: error?.stack,
+          full_error: JSON.stringify(error, null, 2)
+        });
         // Fallback to demo user
         setUser({
           id: 'demo-admin',
