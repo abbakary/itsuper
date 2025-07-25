@@ -65,7 +65,7 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
               </div>
 
               {/* Settings */}
-              {user?.role === 'admin' && onNavigate && (
+              {userProfile?.role === 'admin' && onNavigate && (
                 <>
                   <button 
                     onClick={() => onNavigate('analytics')}
