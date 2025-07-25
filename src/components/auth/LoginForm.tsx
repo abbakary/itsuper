@@ -181,14 +181,12 @@ export function LoginForm() {
             </button>
           </form>
 
-          {/* Login Info */}
+          {/* Company Info */}
           <div className="mt-8 p-4 bg-gradient-to-r from-yellow-50 to-blue-50 rounded-lg border border-yellow-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">SuperDoll IT Support Login</h3>
-            <div className="text-xs text-gray-600 space-y-2">
-              <p><strong>🔑 Admin Access:</strong> admin@superdoll.com / admin123</p>
-              <p><strong>👤 New User:</strong> Use any email + password "123456" to auto-register</p>
-              <p><strong>💡 Your Account:</strong> abbakaryamary@gmail.com / 123456</p>
-            </div>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">SuperDoll IT Support</h3>
+            <p className="text-xs text-gray-600">
+              Use your SuperDoll company credentials to access the IT support system.
+            </p>
           </div>
 
           {/* Footer Logo */}
