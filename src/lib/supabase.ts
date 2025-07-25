@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://ewckojvsymagyjwsfzwn.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3Y2tvanZzeW1hZ3lqd3NmenduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzMjcxNTYsImV4cCI6MjA2ODkwMzE1Nn0.G5uv3850aKSIX7c8a91wQBcOAkQ2K2s8qwbEy-5NN-U'
+const supabaseUrl = 'https://isjdpnugxkhhkhxdpdpc.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzamRwbnVneGtoaGtoeGRwZHBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNTU5NTAsImV4cCI6MjA2ODgzMTk1MH0.itIdQDrDuxcJWXpyHuiDmoDGUVrwk3lzRvwzpzvMOkY'
 
 console.log('🔧 Initializing Supabase client with authentication...');
 
@@ -174,7 +174,7 @@ export type Database = {
 
 // Test authentication and database connection
 const testConnection = async () => {
-  console.log('🔍 Testing Supabase connection and authentication...');
+  console.log('�� Testing Supabase connection and authentication...');
 
   try {
     // Test basic connectivity
