@@ -15,20 +15,50 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
   }
 });
 
-// Test connection
-supabase.from('users').select('count').limit(1).then(({ data, error }) => {
-  if (error) {
-    console.error('Supabase connection test failed:', {
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
-      code: error.code,
-      full_error: JSON.stringify(error, null, 2)
+// Test connection and provide detailed diagnostics
+const testSupabaseConnection = async () => {
+  console.log('Testing Supabase connection...');
+
+  try {
+    // First test basic connectivity
+    const { data, error } = await supabase.from('users').select('count').limit(1);
+
+    if (error) {
+      console.error('Supabase connection test failed:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        status: error.status,
+        statusText: error.statusText,
+        full_error: JSON.stringify(error, null, 2)
+      });
+
+      // Provide specific guidance based on error type
+      if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+        console.warn('🔧 SOLUTION: Tables not found. Please run the SQL schema in Supabase SQL Editor.');
+        console.log('📁 Schema location: src/database/schema.sql');
+      } else if (error.code === '401' || error.message?.includes('authorization') || error.message?.includes('JWT')) {
+        console.warn('🔑 SOLUTION: API key or authentication issue. Check your Supabase credentials.');
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        console.warn('🌐 SOLUTION: Network connectivity issue. Check your internet connection and Supabase URL.');
+      }
+
+    } else {
+      console.log('✅ Supabase connection test successful');
+    }
+  } catch (networkError: any) {
+    console.error('❌ Network error connecting to Supabase:', {
+      message: networkError?.message || 'Unknown network error',
+      name: networkError?.name,
+      stack: networkError?.stack
     });
-  } else {
-    console.log('Supabase connection test successful');
+    console.warn('🌐 Check your internet connection and Supabase URL');
   }
-});
+};
+
+// Run the test
+testSupabaseConnection();
 
 export type Database = {
   public: {
