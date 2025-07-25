@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { SignUpForm } from './SignUpForm';
 import {Eye, EyeOff } from 'lucide-react';
 import logo from '../../assets/images/wecare.png';
 import superdollLogo from '../../assets/images/stm_logo.png';
