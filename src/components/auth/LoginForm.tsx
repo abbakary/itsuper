@@ -40,17 +40,17 @@ export function LoginForm() {
     // Use the login function from AuthContext
     login(email, password).then(success => {
       if (!success) {
-        setError('Invalid credentials. Use demo account: admin@superdoll.com/admin123 or create a new account with any email and password "123456"');
+        setError('Invalid email or password. Please check your credentials and try again.');
         // Clear remembered credentials if login fails
         if (rememberMe) {
           localStorage.removeItem('helpdesk_remembered_credentials');
           setRememberMe(false);
         }
       }
-      // Note: Removing redirect logic as it's handled by App.tsx routing
+      // Login success is handled by App.tsx routing
     }).catch((error) => {
       console.error('Login error:', error);
-      setError(`Login failed: ${error.message || 'Please try again.'}`);
+      setError(`Login failed: ${error.message || 'Please contact your administrator.'}`);
     });
   };
 
