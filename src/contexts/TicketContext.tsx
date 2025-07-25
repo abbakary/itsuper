@@ -198,7 +198,7 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <TicketContext.Provider value={{ tickets, createTicket, updateTicket, deleteTicket, loading }}>
+    <TicketContext.Provider value={{ tickets, createTicket, updateTicket, deleteTicket, loading, error }}>
       {children}
     </TicketContext.Provider>
   );
