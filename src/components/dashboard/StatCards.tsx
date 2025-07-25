@@ -16,7 +16,7 @@ interface StatCardsProps {
   userRole?: 'user' | 'admin';
 }
 
-export function StatCards({ tickets }: StatCardsProps) {
+export function StatCards({ tickets, userRole = 'user' }: StatCardsProps) {
   const openTickets = tickets.filter(t => t.status === 'open').length;
   const inProgressTickets = tickets.filter(t => t.status === 'in-progress').length;
   const resolvedTickets = tickets.filter(t => t.status === 'resolved').length;
