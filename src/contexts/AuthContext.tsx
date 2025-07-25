@@ -15,66 +15,110 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Demo users for testing
-const DEMO_USERS: User[] = [
-  {
-    id: '1',
-    email: 'admin@example.com',
-    name: 'Admin User',
-    role: 'admin',
-    createdAt: new Date().toISOString(),
-    lastLogin: new Date().toISOString(),
-    isActive: true
-  },
-  {
-    id: '2',
-    email: 'user@example.com',
-    name: 'Regular User',
-    role: 'user',
-    createdAt: new Date().toISOString(),
-    lastLogin: new Date().toISOString(),
-    isActive: true
-  }
-];
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>(DEMO_USERS);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user session
-    const storedUser = localStorage.getItem('helpdesk_user');
-    const storedUsers = localStorage.getItem('helpdesk_users');
-    
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    if (storedUsers) {
-      setUsers(JSON.parse(storedUsers));
-    }
-    setLoading(false);
+    // Auto-login for demo purposes - replace with proper auth in production
+    const autoLogin = async () => {
+      try {
+        const { data: adminUser } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', 'admin@superdoll.com')
+          .single();
+
+        if (adminUser) {
+          setUser({
+            id: adminUser.id,
+            email: adminUser.email,
+            name: adminUser.name,
+            role: adminUser.role as 'user' | 'admin',
+            createdAt: adminUser.created_at,
+            lastLogin: new Date().toISOString(),
+            isActive: true,
+            officeName: adminUser.office_name,
+            department: adminUser.department
+          });
+        }
+      } catch (error) {
+        console.error('Auto-login error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsers();
+    autoLogin();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    const foundUser = users.find(u => u.email === email && u.isActive);
-    
-    if (foundUser && 
-        ((email === 'admin@example.com' && password === 'admin123') ||
-         (email === 'user@example.com' && password === 'user123'))) {
-      const updatedUser = { ...foundUser, lastLogin: new Date().toISOString() };
-      setUser(updatedUser);
-      localStorage.setItem('helpdesk_user', JSON.stringify(updatedUser));
-      
-      // Update user's last login in users array
-      const updatedUsers = users.map(u => u.id === foundUser.id ? updatedUser : u);
-      setUsers(updatedUsers);
-      localStorage.setItem('helpdesk_users', JSON.stringify(updatedUsers));
-      
-      return true;
+  const loadUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedUsers: User[] = data.map(dbUser => ({
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.name,
+        role: dbUser.role as 'user' | 'admin',
+        createdAt: dbUser.created_at,
+        lastLogin: dbUser.updated_at,
+        isActive: true,
+        officeName: dbUser.office_name,
+        department: dbUser.department
+      }));
+
+      setUsers(formattedUsers);
+    } catch (error) {
+      console.error('Error loading users:', error);
     }
-    
-    return false;
+  };
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const { data: foundUser, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (error || !foundUser) return false;
+
+      // Simple password check - replace with proper auth in production
+      const isValidPassword =
+        (email === 'admin@superdoll.com' && password === 'admin123') ||
+        (email === 'user@superdoll.com' && password === 'user123') ||
+        (password === 'password123'); // Default password for other users
+
+      if (isValidPassword) {
+        const userObj: User = {
+          id: foundUser.id,
+          email: foundUser.email,
+          name: foundUser.name,
+          role: foundUser.role as 'user' | 'admin',
+          createdAt: foundUser.created_at,
+          lastLogin: new Date().toISOString(),
+          isActive: true,
+          officeName: foundUser.office_name,
+          department: foundUser.department
+        };
+
+        setUser(userObj);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    }
   };
 
   const createUser = async (userData: Omit<User, 'id' | 'createdAt' | 'isActive'>): Promise<boolean> => {
