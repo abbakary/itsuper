@@ -6,6 +6,8 @@ export interface User {
   createdAt: string;
   lastLogin?: string;
   isActive: boolean;
+  officeName?: string;
+  department?: string;
 }
 
 export interface Ticket {
