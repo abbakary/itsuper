@@ -71,7 +71,8 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
           message: error.message,
           details: error.details,
           hint: error.hint,
-          code: error.code
+          code: error.code,
+          full_error: JSON.stringify(error, null, 2)
         });
 
         // Check if it's a table not found error
