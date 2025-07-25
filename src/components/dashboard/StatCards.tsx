@@ -13,6 +13,7 @@ import {
 
 interface StatCardsProps {
   tickets: Ticket[];
+  userRole?: 'user' | 'admin';
 }
 
 export function StatCards({ tickets }: StatCardsProps) {
