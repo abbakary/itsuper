@@ -50,7 +50,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) {
-        console.error('Error loading user profile:', error);
+        console.group('❌ Error loading user profile:');
+        console.error('Message:', error?.message || 'Unknown error');
+        console.error('Code:', error?.code || 'No code');
+        console.error('Details:', error?.details || 'No details');
+        console.error('Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+        console.groupEnd();
 
         // If tables don't exist, create a basic profile from user data
         if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
