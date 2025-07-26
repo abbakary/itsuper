@@ -92,6 +92,10 @@ export function SignUpForm({ onBackToLogin }: { onBackToLogin: () => void }) {
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h2>
         <p className="text-gray-600">Join the SuperDoll IT Support System</p>
+        <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+          <p className="text-sm text-green-700">✅ Quick Setup: Default password is pre-filled</p>
+          <p className="text-xs text-green-600">Just enter your name and email to get started!</p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
