@@ -264,6 +264,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('Sign in error:', error);
+
+        // Handle specific error cases
+        if (error.message.includes('Email not confirmed')) {
+          return { success: false, error: 'Please check your email and click the confirmation link, or contact your administrator to activate your account.' };
+        } else if (error.message.includes('Invalid login credentials')) {
+          return { success: false, error: 'Invalid email or password. Please check your credentials.' };
+        }
+
         return { success: false, error: error.message };
       }
 
