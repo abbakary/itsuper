@@ -233,6 +233,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (data.user) {
         console.log('✅ User signed up successfully');
+
+        // Try to create profile immediately after signup
+        const profile = await createUserProfile(data.user);
+        if (profile) {
+          console.log('✅ User profile created immediately after signup');
+        } else {
+          console.warn('⚠️ Profile creation failed, but signup succeeded. Profile will be created on next login.');
+        }
+
         return { success: true };
       }
 
