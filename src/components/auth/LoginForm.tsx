@@ -192,6 +192,11 @@ export function LoginForm() {
             <p className="text-xs text-gray-600 mb-2">
               Use your SuperDoll company credentials to access the IT support system.
             </p>
+            <div className="text-xs text-gray-500 mb-2 bg-blue-50 p-2 rounded">
+              <p className="font-medium text-blue-700 mb-1">Demo Accounts:</p>
+              <p>Admin: admin@superdoll.com / password123</p>
+              <p>User: user@superdoll.com / password123</p>
+            </div>
             <p className="text-xs text-gray-500 mb-2">
               Don't have an account?
               <button
