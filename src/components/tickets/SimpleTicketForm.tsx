@@ -25,7 +25,7 @@ export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
         .from('tickets')
         .insert({
           title: formData.title,
-          description: `Issue reported by: ${formData.reporterName}`,
+          description: formData.description,
           priority: 'medium',
           category: 'General Issue',
           specific_issue: formData.title,
