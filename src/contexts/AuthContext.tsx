@@ -222,7 +222,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             role: userData.role || 'user',
             office_name: userData.office_name || 'SuperDoll Office',
             department: userData.department || 'General'
-          }
+          },
+          emailRedirectTo: undefined // Disable email confirmation requirement
         }
       });
 
