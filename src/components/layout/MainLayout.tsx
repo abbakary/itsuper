@@ -24,16 +24,14 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
   const { user, userProfile, signOut } = useAuth();
 
   const handleLogout = async () => {
-    if (confirm('Are you sure you want to logout?')) {
-      try {
-        console.log('🚪 Logging out...');
-        await signOut();
-        console.log('✅ Logged out successfully');
-        // The App.tsx will automatically redirect to login when user becomes null
-      } catch (error) {
-        console.error('❌ Logout error:', error);
-        alert('Failed to logout. Please try again.');
-      }
+    try {
+      console.log('🚪 Logging out...');
+      await signOut();
+      console.log('✅ Logged out successfully');
+      // The App.tsx will automatically redirect to login when user becomes null
+    } catch (error) {
+      console.error('❌ Logout error:', error);
+      alert('Failed to logout. Please try again.');
     }
   };
 
