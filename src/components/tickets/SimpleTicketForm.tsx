@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabase';
+import { useTickets } from '../../contexts/TicketContext';
 import { AlertCircle, User, Send } from 'lucide-react';
 
 export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
