@@ -138,6 +138,13 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
         throw new Error('User must be authenticated to create tickets');
       }
 
+      // Ensure user profile exists before creating ticket
+      console.log('🔧 Ensuring user profile exists...');
+      const profileResult = await ensureCurrentUserProfile();
+      if (!profileResult.success) {
+        throw new Error(`Failed to ensure user profile: ${profileResult.error}`);
+      }
+
       const { error } = await supabase
         .from('tickets')
         .insert({
