@@ -101,6 +101,22 @@ export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
                 required
               />
             </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-blue-600" />
+                Issue Description *
+              </label>
+              <textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg resize-none"
+                placeholder="Please provide more details about your issue. What were you doing when it occurred? What error messages did you see? The more details you provide, the faster we can help you."
+                required
+              />
+            </div>
           </div>
 
           {/* Submit Button */}
