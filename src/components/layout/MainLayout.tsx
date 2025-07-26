@@ -48,7 +48,11 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo and Title */}
-            <div className="flex items-center gap-3">
+            <button
+              onClick={() => onNavigate?.('dashboard')}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+              title="Go to Dashboard"
+            >
               <div className="bg-gradient-to-r from-yellow-400 to-blue-500 p-2 rounded-lg">
                 <Star className="w-6 h-6 text-white" />
               </div>
@@ -56,7 +60,7 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
                 <h1 className="text-xl font-bold bg-gradient-to-r from-yellow-500 to-blue-600 bg-clip-text text-transparent">SuperDoll</h1>
                 <p className="text-xs text-gray-500">IT Support & Excellence</p>
               </div>
-            </div>
+            </button>
 
             {/* User Info and Actions */}
             <div className="flex items-center gap-4">
