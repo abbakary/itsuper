@@ -7,7 +7,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onNavigate }: DashboardHeaderProps) {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
