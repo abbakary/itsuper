@@ -110,7 +110,12 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
       setTickets(formattedTickets);
       setError(undefined);
     } catch (error: any) {
-      logSupabaseError('Loading tickets (catch block)', error);
+      console.group('❌ Loading tickets failed:');
+      console.error('Error message:', error?.message || 'Unknown error');
+      console.error('Error code:', error?.code || 'No code');
+      console.error('Error details:', error?.details || 'No details');
+      console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      console.groupEnd();
 
       // Set error message for display
       const errorMessage = error?.message || 'Unknown database error';
