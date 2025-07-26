@@ -80,8 +80,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       return data as UserProfile;
-    } catch (error) {
-      console.error('Error loading user profile:', error);
+    } catch (error: any) {
+      console.group('❌ Exception in loadUserProfile:');
+      console.error('Message:', error?.message || 'Unknown error');
+      console.error('Name:', error?.name || 'Unknown');
+      console.error('Stack:', error?.stack || 'No stack');
+      console.error('Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      console.groupEnd();
       return null;
     }
   };
