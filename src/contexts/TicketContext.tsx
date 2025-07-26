@@ -61,19 +61,10 @@ export function TicketProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🎫 Loading tickets from Supabase...');
 
-      // Try to load tickets with user profile information
+      // Load tickets without join - we'll get user info separately if needed
       const { data, error } = await supabase
         .from('tickets')
-        .select(`
-          *,
-          user_profiles (
-            full_name,
-            email,
-            role,
-            office_name,
-            department
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
