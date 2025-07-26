@@ -7,7 +7,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onNavigate }: DashboardHeaderProps) {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
@@ -18,26 +18,37 @@ export function DashboardHeader({ onNavigate }: DashboardHeaderProps) {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {user?.role === 'admin' ? 'Admin Dashboard' : 'My Tickets'}
+              {userProfile?.role === 'admin' ? 'Admin Dashboard' : 'My Tickets'}
             </h1>
             <p className="text-gray-600">
-              {user?.role === 'admin' 
-                ? 'Manage and resolve support tickets' 
+              {userProfile?.role === 'admin'
+                ? 'Manage and resolve support tickets'
                 : 'View and track your support requests'
               }
             </p>
           </div>
         </div>
         
-        {user?.role === 'user' && (
-          <button
-            onClick={() => onNavigate('create-ticket')}
-            className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-          >
-            <Plus className="w-5 h-5" />
-            New Ticket
-          </button>
-        )}
+        <div className="flex gap-3">
+          {userProfile?.role !== 'admin' && (
+            <button
+              onClick={() => onNavigate('create-ticket')}
+              className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <Plus className="w-5 h-5" />
+              Create New Ticket
+            </button>
+          )}
+          {userProfile?.role === 'admin' && (
+            <button
+              onClick={() => onNavigate('create-ticket')}
+              className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <Plus className="w-5 h-5" />
+              Create Ticket
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

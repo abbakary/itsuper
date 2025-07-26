@@ -12,10 +12,31 @@ import { UserManagementPage } from './pages/UserManagementPage';
 import { useAuth } from './contexts/AuthContext';
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [currentPage, setCurrentPage] = React.useState('dashboard');
   const [selectedTicketId, setSelectedTicketId] = React.useState<string | null>(null);
 
+  // Reset page state when user logs out
+  React.useEffect(() => {
+    if (!user && !loading) {
+      setCurrentPage('dashboard');
+      setSelectedTicketId(null);
+    }
+  }, [user, loading]);
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading SuperDoll IT Support...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login page if not authenticated
   if (!user) {
     return <LoginPage />;
   }

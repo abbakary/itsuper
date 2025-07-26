@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { SignUpForm } from './SignUpForm';
 import {Eye, EyeOff } from 'lucide-react';
 import logo from '../../assets/images/wecare.png';
 import superdollLogo from '../../assets/images/stm_logo.png';
 
 export function LoginForm() {
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+  const [showSignUp, setShowSignUp] = useState(false);
 
   // Load remembered credentials on component mount
   React.useEffect(() => {
@@ -37,29 +39,20 @@ export function LoginForm() {
       localStorage.removeItem('helpdesk_remembered_credentials');
     }
 
-    // Use the login function from AuthContext
-    login(email, password).then(success => {
+    // Use the signIn function from AuthContext
+    signIn(email, password).then(({ success, error: authError }) => {
       if (!success) {
-        setError('Invalid credentials. Use demo accounts: admin@example.com/admin123 or user@example.com/user123');
+        setError(authError || 'Invalid email or password. Please check your credentials and try again.');
         // Clear remembered credentials if login fails
         if (rememberMe) {
           localStorage.removeItem('helpdesk_remembered_credentials');
           setRememberMe(false);
         }
-      } else {
-        // Redirect to appropriate page based on user role
-        const storedUser = localStorage.getItem('helpdesk_user');
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-          if (user.role === 'user') {
-            window.location.href = '/dashboard';
-          } else {
-            window.location.href = '/';
-          }
-        }
       }
-    }).catch(() => {
-      setError('Login failed. Please try again.');
+      // Login success is handled by App.tsx routing via auth state change
+    }).catch((error) => {
+      console.error('Login error:', error);
+      setError(`Login failed: ${error.message || 'Please contact your administrator.'}`);
     });
   };
 
@@ -103,6 +96,9 @@ export function LoginForm() {
 
       {/* Right Side - Login Form */}
       <div className="flex-1 bg-white flex items-center justify-center p-8">
+        {showSignUp ? (
+          <SignUpForm onBackToLogin={() => setShowSignUp(false)} />
+        ) : (
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
@@ -133,7 +129,7 @@ export function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="admin@example.com"
+                placeholder="your.email@superdoll.com"
                 required
               />
             </div>
@@ -190,14 +186,27 @@ export function LoginForm() {
             </button>
           </form>
 
-          {/* Demo Credentials */}
-          {/* <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
-            <div className="text-xs text-gray-600 space-y-1">
-              <p><strong>Admin:</strong> admin@example.com / admin123</p>
-              <p><strong>User:</strong> user@example.com / user123</p>
+          {/* Company Info */}
+          <div className="mt-8 p-4 bg-gradient-to-r from-yellow-50 to-blue-50 rounded-lg border border-yellow-200">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">SuperDoll IT Support</h3>
+            <p className="text-xs text-gray-600 mb-2">
+              Use your SuperDoll company credentials to access the IT support system.
+            </p>
+            <div className="text-xs text-gray-500 mb-2 bg-amber-50 p-2 rounded border border-amber-200">
+              <p className="font-medium text-amber-700 mb-1">⚠️ No Demo Accounts Available</p>
+              <p className="text-amber-600">Please create a new account using the "Sign up here" button below.</p>
+              <p className="text-amber-600 mt-1">Use a valid email format like: yourname@superdoll.com</p>
             </div>
-          </div> */}
+            <p className="text-xs text-gray-500 mb-2">
+              Don't have an account?
+              <button
+                onClick={() => setShowSignUp(true)}
+                className="text-blue-600 hover:text-blue-700 underline ml-1"
+              >
+                Sign up here
+              </button>
+            </p>
+          </div>
 
           {/* Footer Logo */}
           <div className="mt-8 flex justify-center items-center">
@@ -209,6 +218,7 @@ export function LoginForm() {
   </div>
 </div>
         </div>
+        )}
       </div>
     </div>
   );

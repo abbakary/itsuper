@@ -3,6 +3,7 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { TicketList } from '../components/tickets/TicketList';
 import { StatCards } from '../components/dashboard/StatCards';
 import { DashboardHeader } from '../components/dashboard/DashboardHeader';
+import { ErrorNotification } from '../components/ui/ErrorNotification';
 import { useTickets } from '../contexts/TicketContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Ticket } from '../types';
@@ -13,12 +14,14 @@ interface DashboardPageProps {
 }
 
 export function DashboardPage({ onNavigate, onTicketSelect }: DashboardPageProps) {
-  const { tickets } = useTickets();
-  const { user } = useAuth();
+  const { tickets, error } = useTickets();
+  const { user, userProfile } = useAuth();
   const [filter, setFilter] = useState<'all' | 'open' | 'in-progress' | 'resolved' | 'closed'>('all');
+  const [showError, setShowError] = useState(true);
 
   const filteredTickets = tickets.filter((ticket: Ticket) => {
-    if (user?.role === 'user' && ticket.userId !== user.id) {
+    // If user is not admin, only show their own tickets
+    if (userProfile?.role !== 'admin' && ticket.userId !== user?.id) {
       return false;
     }
     if (filter === 'all') return true;
@@ -33,7 +36,16 @@ export function DashboardPage({ onNavigate, onTicketSelect }: DashboardPageProps
     <MainLayout onNavigate={onNavigate}>
       <div className="space-y-6">
         <DashboardHeader onNavigate={onNavigate} />
-        <StatCards tickets={tickets} />
+
+        {/* Error Notification */}
+        {error && showError && (
+          <ErrorNotification
+            message={error}
+            onDismiss={() => setShowError(false)}
+          />
+        )}
+
+        <StatCards tickets={tickets} userRole={userProfile?.role} />
         
         {/* Filter Buttons */}
         <div className="flex gap-2 mb-6">
