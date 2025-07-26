@@ -29,15 +29,26 @@ export function DashboardHeader({ onNavigate }: DashboardHeaderProps) {
           </div>
         </div>
         
-        {user?.role === 'user' && (
-          <button
-            onClick={() => onNavigate('create-ticket')}
-            className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-          >
-            <Plus className="w-5 h-5" />
-            New Ticket
-          </button>
-        )}
+        <div className="flex gap-3">
+          {userProfile?.role !== 'admin' && (
+            <button
+              onClick={() => onNavigate('create-ticket')}
+              className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <Plus className="w-5 h-5" />
+              Create New Ticket
+            </button>
+          )}
+          {userProfile?.role === 'admin' && (
+            <button
+              onClick={() => onNavigate('create-ticket')}
+              className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <Plus className="w-5 h-5" />
+              Create Ticket
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
