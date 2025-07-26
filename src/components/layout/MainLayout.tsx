@@ -1,6 +1,8 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { MovingText } from '../ui/MovingText';
+import { NotificationDropdown } from '../ui/NotificationDropdown';
+import { SettingsDropdown } from '../ui/SettingsDropdown';
 import {
   LogOut,
   Settings,
@@ -21,19 +23,14 @@ interface MainLayoutProps {
 export function MainLayout({ children, onNavigate }: MainLayoutProps) {
   const { user, userProfile, signOut } = useAuth();
 
-  const handleNotificationClick = () => {
-    alert('🔔 Notifications feature coming soon! You will be notified when:\n\n• Your tickets are updated\n• New messages are added\n• Tickets are resolved\n• System announcements');
-  };
-
-  const handleSettingsClick = () => {
-    alert('⚙️ Settings feature coming soon! You will be able to:\n\n• Update your profile\n• Change notification preferences\n• Customize dashboard\n• Manage account settings');
-  };
-
   const handleLogout = async () => {
     if (confirm('Are you sure you want to logout?')) {
       try {
+        console.log('🚪 Logging out...');
         await signOut();
         console.log('✅ Logged out successfully');
+        // Force navigation to login page
+        window.location.href = '/';
       } catch (error) {
         console.error('❌ Logout error:', error);
         alert('Failed to logout. Please try again.');
@@ -65,15 +62,7 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
             {/* User Info and Actions */}
             <div className="flex items-center gap-4">
               {/* Notifications */}
-              <button
-                onClick={handleNotificationClick}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors relative"
-                title="Notifications"
-              >
-                <Bell className="w-5 h-5" />
-                {/* Notification badge */}
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
-              </button>
+              <NotificationDropdown />
 
               {/* User Profile */}
               <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
@@ -114,13 +103,7 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
                 </>
               )}
               
-              <button
-                onClick={handleSettingsClick}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Settings"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
+              <SettingsDropdown />
 
               {/* Logout */}
               <button
