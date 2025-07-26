@@ -6,10 +6,10 @@ export function SignUpForm({ onBackToLogin }: { onBackToLogin: () => void }) {
   const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
+    password: 'password123',
     full_name: '',
     role: 'user' as 'user' | 'admin',
-    office_name: 'SuperDoll Office',
+    office_name: 'SuperDoll HQ',
     department: 'General'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
