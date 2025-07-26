@@ -41,7 +41,8 @@ export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
       // Reset form
       setFormData({
         reporterName: '',
-        title: ''
+        title: '',
+        description: ''
       });
 
       alert('Ticket created successfully!');
