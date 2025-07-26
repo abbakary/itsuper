@@ -192,11 +192,10 @@ export function LoginForm() {
             <p className="text-xs text-gray-600 mb-2">
               Use your SuperDoll company credentials to access the IT support system.
             </p>
-            <div className="text-xs text-gray-500 mb-2 bg-blue-50 p-2 rounded">
-              <p className="font-medium text-blue-700 mb-1">Demo Accounts:</p>
-              <p>Admin: admin@superdoll.com / password123</p>
-              <p>User: user@superdoll.com / password123</p>
-              <p className="text-red-600 mt-1 font-medium">Note: If you get "Email not confirmed" error, contact admin to activate your account.</p>
+            <div className="text-xs text-gray-500 mb-2 bg-amber-50 p-2 rounded border border-amber-200">
+              <p className="font-medium text-amber-700 mb-1">⚠️ No Demo Accounts Available</p>
+              <p className="text-amber-600">Please create a new account using the "Sign up here" button below.</p>
+              <p className="text-amber-600 mt-1">Use a valid email format like: yourname@superdoll.com</p>
             </div>
             <p className="text-xs text-gray-500 mb-2">
               Don't have an account?
