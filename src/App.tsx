@@ -16,6 +16,14 @@ function AppContent() {
   const [currentPage, setCurrentPage] = React.useState('dashboard');
   const [selectedTicketId, setSelectedTicketId] = React.useState<string | null>(null);
 
+  // Reset page state when user logs out
+  React.useEffect(() => {
+    if (!user && !loading) {
+      setCurrentPage('dashboard');
+      setSelectedTicketId(null);
+    }
+  }, [user, loading]);
+
   // Show loading spinner while checking authentication
   if (loading) {
     return (
