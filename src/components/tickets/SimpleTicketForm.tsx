@@ -7,7 +7,8 @@ export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     reporterName: '',
-    title: ''
+    title: '',
+    description: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
