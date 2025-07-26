@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Ticket } from '../types';
 import { supabase } from '../lib/supabase';
 import { logSupabaseError, isMissingTableError } from '../utils/errorLogger';
+import { ensureCurrentUserProfile } from '../utils/syncUsers';
 
 interface TicketContextType {
   tickets: Ticket[];
