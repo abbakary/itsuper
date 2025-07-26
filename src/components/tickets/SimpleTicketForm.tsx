@@ -4,7 +4,8 @@ import { useTickets } from '../../contexts/TicketContext';
 import { AlertCircle, User, Send } from 'lucide-react';
 
 export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
+  const { createTicket } = useTickets();
   const [formData, setFormData] = useState({
     reporterName: '',
     title: '',
@@ -19,46 +20,27 @@ export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
       return;
     }
 
+    if (!user) {
+      alert('You must be logged in to create a ticket');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      console.log('🎫 Creating ticket with data:', formData);
-
-      // Get current user
-      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
-
-      if (userError || !currentUser) {
-        throw new Error('You must be logged in to create a ticket');
-      }
-
-      console.log('�� Current user:', currentUser.id);
-
       const ticketData = {
         title: formData.title,
         description: formData.description,
-        priority: 'medium',
+        priority: 'medium' as const,
         category: 'General Issue',
-        specific_issue: formData.title,
-        reporter_name: formData.reporterName,
-        department: 'General',
-        assigned_admin: 'Auto-assigned',
-        user_id: currentUser.id,
-        status: 'open'
+        specificIssue: formData.title,
+        reporterName: formData.reporterName,
+        department: userProfile?.department || 'General',
+        assignedAdmin: 'Auto-assigned',
+        userId: user.id,
+        status: 'open' as const
       };
 
-      console.log('📝 Inserting ticket data:', ticketData);
-
-      const { data, error } = await supabase
-        .from('tickets')
-        .insert(ticketData)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('❌ Supabase error:', error);
-        throw new Error(`Database error: ${error.message}`);
-      }
-
-      console.log('✅ Ticket created successfully:', data);
+      await createTicket(ticketData);
 
       // Reset form
       setFormData({
