@@ -128,7 +128,9 @@ export function SignUpForm({ onBackToLogin }: { onBackToLogin: () => void }) {
             value={formData.email}
             onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="your.email@superdoll.com"
+            placeholder="john.doe@superdoll.com"
+            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+            title="Please enter a valid email address (e.g., john.doe@superdoll.com)"
             required
           />
         </div>
