@@ -18,11 +18,11 @@ export function DashboardHeader({ onNavigate }: DashboardHeaderProps) {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {user?.role === 'admin' ? 'Admin Dashboard' : 'My Tickets'}
+              {userProfile?.role === 'admin' ? 'Admin Dashboard' : 'My Tickets'}
             </h1>
             <p className="text-gray-600">
-              {user?.role === 'admin' 
-                ? 'Manage and resolve support tickets' 
+              {userProfile?.role === 'admin'
+                ? 'Manage and resolve support tickets'
                 : 'View and track your support requests'
               }
             </p>
