@@ -29,8 +29,7 @@ export function MainLayout({ children, onNavigate }: MainLayoutProps) {
         console.log('🚪 Logging out...');
         await signOut();
         console.log('✅ Logged out successfully');
-        // Force navigation to login page
-        window.location.href = '/';
+        // The App.tsx will automatically redirect to login when user becomes null
       } catch (error) {
         console.error('❌ Logout error:', error);
         alert('Failed to logout. Please try again.');
