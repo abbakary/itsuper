@@ -21,22 +21,44 @@ export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('tickets')
-        .insert({
-          title: formData.title,
-          description: formData.description,
-          priority: 'medium',
-          category: 'General Issue',
-          specific_issue: formData.title,
-          reporter_name: formData.reporterName,
-          department: 'General',
-          assigned_admin: 'Auto-assigned',
-          user_id: user?.id || 'demo-user',
-          status: 'open'
-        });
+      console.log('🎫 Creating ticket with data:', formData);
 
-      if (error) throw error;
+      // Get current user
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !currentUser) {
+        throw new Error('You must be logged in to create a ticket');
+      }
+
+      console.log('�� Current user:', currentUser.id);
+
+      const ticketData = {
+        title: formData.title,
+        description: formData.description,
+        priority: 'medium',
+        category: 'General Issue',
+        specific_issue: formData.title,
+        reporter_name: formData.reporterName,
+        department: 'General',
+        assigned_admin: 'Auto-assigned',
+        user_id: currentUser.id,
+        status: 'open'
+      };
+
+      console.log('📝 Inserting ticket data:', ticketData);
+
+      const { data, error } = await supabase
+        .from('tickets')
+        .insert(ticketData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
+
+      console.log('✅ Ticket created successfully:', data);
 
       // Reset form
       setFormData({
@@ -47,9 +69,10 @@ export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
 
       alert('Ticket created successfully!');
       onSubmit?.();
-    } catch (error) {
-      console.error('Error creating ticket:', error);
-      alert('Failed to create ticket. Please try again.');
+    } catch (error: any) {
+      console.error('💥 Error creating ticket:', error);
+      const errorMessage = error?.message || 'Failed to create ticket';
+      alert(`Error: ${errorMessage}. Please try again or contact support.`);
     } finally {
       setIsSubmitting(false);
     }
