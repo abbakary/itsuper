@@ -14,7 +14,7 @@ export function SimpleTicketForm({ onSubmit }: { onSubmit?: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.reporterName || !formData.title) {
+    if (!formData.reporterName || !formData.title || !formData.description) {
       alert('Please fill in all required fields');
       return;
     }
