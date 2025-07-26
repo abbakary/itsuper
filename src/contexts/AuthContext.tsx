@@ -40,6 +40,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Create user profile if it doesn't exist
+  const createUserProfile = async (user: User) => {
+    try {
+      console.log('🔧 Creating missing user profile for:', user.email);
+
+      const profileData = {
+        id: user.id,
+        email: user.email || '',
+        full_name: user.user_metadata?.full_name || user.email || 'User',
+        role: user.user_metadata?.role || 'user',
+        office_name: user.user_metadata?.office_name || 'SuperDoll Office',
+        department: user.user_metadata?.department || 'General',
+        is_active: true
+      };
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .insert(profileData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Failed to create user profile:', error);
+        return null;
+      }
+
+      console.log('✅ User profile created successfully');
+      return data as UserProfile;
+    } catch (error: any) {
+      console.error('❌ Exception creating user profile:', error);
+      return null;
+    }
+  };
+
   // Load user profile from database
   const loadUserProfile = async (userId: string) => {
     try {
@@ -57,8 +91,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
         console.groupEnd();
 
+        // If profile not found (PGRST116), try to create it
+        if (error.code === 'PGRST116') {
+          console.warn('🔧 User profile not found, attempting to create it...');
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user && user.id === userId) {
+            const newProfile = await createUserProfile(user);
+            if (newProfile) {
+              return newProfile;
+            }
+          }
+        }
+
         // If tables don't exist, create a basic profile from user data
-        if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+        if (error.message?.includes('does not exist')) {
           console.warn('User profiles table not found, creating fallback profile');
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
